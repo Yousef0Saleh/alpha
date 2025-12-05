@@ -37,3 +37,6 @@ next-env.d.ts
 
 # contentlayer
 .contentlayer
+
+# pnpm (we use npm)
+pnpm-lock.yaml

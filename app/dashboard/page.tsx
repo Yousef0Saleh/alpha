@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
+import { API_BASE_URL } from "@/lib/config";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import OnboardingModal from "@/components/OnboardingModal";
 import {
@@ -41,7 +42,6 @@ interface DashboardData {
   }>;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5/alpha/backend/routes';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
@@ -83,7 +83,7 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      const response = await fetch(`${API_BASE}/dashboard.php`, {
+      const response = await fetch(`${API_BASE_URL}/routes/dashboard.php`, {
         credentials: 'include',
       });
 

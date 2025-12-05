@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "../../hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function VerifyEmail() {
   const router = useRouter();

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import Toast from "@/components/Toast";
+import { API_BASE_URL } from "@/lib/config";
 import {
   FileText,
   Upload,
@@ -72,9 +73,8 @@ export default function ExamGeneratorPage() {
   useEffect(() => {
     (async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
         const res = await fetch(
-          `${API_URL}/alpha/backend/routes/get_csrf.php`,
+          `${API_BASE_URL}/routes/get_csrf.php`,
           { credentials: "include" }
         );
         const data = await res.json();
@@ -211,10 +211,8 @@ export default function ExamGeneratorPage() {
       formData.append("difficulty", difficulty);
       formData.append("question_types", JSON.stringify(questionTypes));
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
-
       const res = await fetch(
-        `${API_URL}/alpha/backend/routes/exam_generator/generate_exam.php`,
+        `${API_BASE_URL}/routes/exam_generator/generate_exam.php`,
         {
           method: "POST",
           credentials: "include",
@@ -327,10 +325,8 @@ export default function ExamGeneratorPage() {
     if (!examResult) return;
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
-
       const response = await fetch(
-        `${API_URL}/alpha/backend/routes/exam_generator/generate_pdf.php`,
+        `${API_BASE_URL}/routes/exam_generator/generate_pdf.php`,
         {
           method: "POST",
           credentials: "include",

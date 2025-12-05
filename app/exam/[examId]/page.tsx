@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import Toast from "@/components/Toast";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface Question {
   id: number;
@@ -658,7 +658,7 @@ export default function ExamPage() {
             actions_json: actions,
           };
 
-          fetch('${API_BASE_URL}/routes/exam/submit_exam.php', {
+          fetch(`${API_BASE_URL}/routes/exam/submit_exam.php`, {
             method: 'POST',
             keepalive: true,
             credentials: 'include',

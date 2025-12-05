@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/lib/config";
 
 interface AdminUser {
   id: number;
@@ -22,9 +23,8 @@ export function useAdmin() {
 
   const checkAdmin = async () => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
       const res = await fetch(
-        `${API_URL}/alpha/backend/routes/admin/auth/check_admin.php`,
+        `${API_BASE_URL}/routes/admin/auth/check_admin.php`,
         { credentials: "include" }
       );
 
@@ -45,9 +45,8 @@ export function useAdmin() {
 
   const logout = async () => {
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
       await fetch(
-        `${API_URL}/alpha/backend/routes/admin/auth/admin_logout.php`,
+        `${API_BASE_URL}/routes/admin/auth/admin_logout.php`,
         {
           method: "POST",
           credentials: "include"

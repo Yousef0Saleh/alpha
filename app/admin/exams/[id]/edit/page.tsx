@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Plus, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface Question {
   question: string;
@@ -121,7 +121,7 @@ export default function EditExamPage() {
 
     setSaving(true);
     try {
-      const res = await fetch('${API_BASE_URL}/routes/admin/exams/update.php', {
+      const res = await fetch(`${API_BASE_URL}/routes/admin/exams/update.php`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

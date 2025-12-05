@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import Toast from "@/components/Toast";
 import LoaderOverlay from "@/components/LoaderOverlay";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -54,7 +55,7 @@ export default function SignIn() {
 
     setResendingEmail(true);
     try {
-      const res = await fetch("http://192.168.1.5/alpha/backend/routes/resend-verification.php", {
+      const res = await fetch(`${API_BASE_URL}/routes/resend-verification.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: unverifiedEmail }),
@@ -82,7 +83,7 @@ export default function SignIn() {
     setEmailNotVerified(false);
 
     try {
-      const res = await fetch("http://192.168.1.5/alpha/backend/routes/login.php", {
+      const res = await fetch(`${API_BASE_URL}/routes/login.php`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

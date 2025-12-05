@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 import {
   Search,
   Plus,
@@ -65,7 +65,7 @@ export default function AdminExamsPage() {
     if (!confirm(`متأكد إنك عايز تمسح امتحان "${examTitle}"؟`)) return;
 
     try {
-      const res = await fetch('${API_BASE_URL}/routes/admin/exams/delete.php', {
+      const res = await fetch(`${API_BASE_URL}/routes/admin/exams/delete.php`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

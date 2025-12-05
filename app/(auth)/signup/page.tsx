@@ -7,7 +7,7 @@ import { useAuth } from "@/app/hooks/useAuth";
 import Toast from "@/components/Toast";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import PasswordStrengthIndicator from "@/components/PasswordStrengthIndicator";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", grade: "" });
@@ -105,7 +105,8 @@ export default function SignUp() {
       } else {
         setToast({ message: data.message || "فشل التسجيل", type: "error" });
       }
-    } catch {
+    } catch(err) {
+      console.error(err);
       setToast({ message: "مشكلة في السيرفر. جرب تاني بعد شوية.", type: "error" });
     } finally {
       setLoadingSubmit(false);

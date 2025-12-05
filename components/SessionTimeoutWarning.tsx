@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/lib/config";
 
 interface SessionTimeoutWarningProps {
   warningMinutes?: number; // Minutes before timeout to show warning
@@ -68,7 +69,7 @@ export default function SessionTimeoutWarning({
   const handleExtendSession = async () => {
     try {
       // Call backend to extend session
-      await fetch("http://192.168.1.5/alpha/backend/routes/session.php", {
+      await fetch(`${API_BASE_URL}/routes/session.php`, {
         method: "GET",
         credentials: "include",
       });

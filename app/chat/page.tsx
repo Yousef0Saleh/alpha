@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import ReactMarkdown from 'react-markdown';
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 import {
-MessageSquare,
+  MessageSquare,
   Send,
   Search,
   Menu,

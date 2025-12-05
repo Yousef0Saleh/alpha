@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Wand2, TrendingUp, Users, Calendar, FileQuestion, User, Clock } from "lucide-react";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface GeneratorStats {
   total_generated: number;
@@ -29,7 +29,7 @@ export default function AdminExamGeneratorPage() {
   const fetchStats = async () => {
     try {
       const res = await fetch(
-        '${API_BASE_URL}/routes/admin/generator/statistics.php',
+        `${API_BASE_URL}/routes/admin/generator/statistics.php`,
         { credentials: 'include' }
       );
       const data = await res.json();

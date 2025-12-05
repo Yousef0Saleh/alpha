@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import Toast from "@/components/Toast";
 import LoaderOverlay from "@/components/LoaderOverlay";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function ResetPassword() {
   const searchParams = useSearchParams();

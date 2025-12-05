@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface Question {
   question: string;
@@ -84,7 +84,7 @@ export default function NewExamPage() {
 
     setLoading(true);
     try {
-      const res = await fetch('${API_BASE_URL}/routes/admin/exams/create.php', {
+      const res = await fetch(`${API_BASE_URL}/routes/admin/exams/create.php`, {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },

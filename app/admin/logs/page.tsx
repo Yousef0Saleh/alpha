@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Activity, Calendar, User, AlertCircle, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, FileText, Settings, Trash2 } from "lucide-react";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface ActivityLog {
   id: number;

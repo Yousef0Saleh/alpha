@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 import {
   Search,
-  UserPlus,
   Eye,
-  Edit,
   Ban,
   Trash2,
   Shield,

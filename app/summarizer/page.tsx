@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import Toast from "@/components/Toast";
+import { API_BASE_URL } from "@/lib/config";
 import {
   FileText,
   Upload,
@@ -80,9 +81,8 @@ export default function SummarizerPage() {
   useEffect(() => {
     (async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
         const res = await fetch(
-          `${API_URL}/alpha/backend/routes/get_csrf.php`,
+          `${API_BASE_URL}/routes/get_csrf.php`,
           { credentials: "include" }
         );
         const data = await res.json();
@@ -125,9 +125,8 @@ export default function SummarizerPage() {
   const loadHistory = async () => {
     setLoadingHistory(true);
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
       const res = await fetch(
-        `${API_URL}/alpha/backend/routes/summarizer/get_history.php`,
+        `${API_BASE_URL}/routes/summarizer/get_history.php`,
         { credentials: "include" }
       );
 
@@ -270,10 +269,8 @@ export default function SummarizerPage() {
       formData.append("detail_level", getDetailLevel(summaryLength));
       formData.append("target_length", summaryLength.toString());
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
-
       const res = await fetch(
-        `${API_URL}/alpha/backend/routes/summarizer/summarize_file.php`,
+        `${API_BASE_URL}/routes/summarizer/summarize_file.php`,
         {
           method: "POST",
           credentials: "include",
@@ -386,10 +383,8 @@ ${summaryResult.summary.topics_covered.join(", ")}
     if (!summaryResult) return;
 
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://192.168.1.5';
-
       const response = await fetch(
-        `${API_URL}/alpha/backend/routes/summarizer/generate_summary_pdf.php`,
+        `${API_BASE_URL}/routes/summarizer/generate_summary_pdf.php`,
         {
           method: "POST",
           credentials: "include",

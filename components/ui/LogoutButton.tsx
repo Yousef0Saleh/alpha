@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "../LoaderOverlay";
+import { API_BASE_URL } from "@/lib/config";
 
 export default function LogoutButton() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function LogoutButton() {
     setLoading(true);
     try {
       const res = await fetch(
-        "http://192.168.1.5/alpha/backend/routes/logout.php",
+        `${API_BASE_URL}/routes/logout.php`,
         {
           method: "POST",
           credentials: "include",

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import Toast from "@/components/Toast";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface Exam {
   id: number;
@@ -46,7 +46,7 @@ export default function ExamsPage() {
       setLoading(true);
       try {
         const res = await fetch(
-          API_ROUTES.getExams,
+          `${API_BASE_URL}/routes/get_exams.php`,
           { credentials: "include" }
         );
 

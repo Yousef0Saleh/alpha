@@ -23,6 +23,16 @@ const nextConfig = {
     optimizeCss: true,
   },
 
+  // Rewrites for proxying backend API (solves cross-domain session issues)
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/:path*`,
+      },
+    ];
+  },
+
   // Headers for better caching and security
   async headers() {
     return [

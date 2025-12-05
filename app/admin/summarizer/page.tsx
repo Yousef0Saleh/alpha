@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FileSpreadsheet, TrendingUp, Users, Calendar, FileText, User, Clock } from "lucide-react";
-import { API_BASE_URL, API_ROUTES, SITE_URL } from "@/lib/config";
+import { API_BASE_URL } from "@/lib/config";
 
 interface SummarizerStats {
   total_summaries: number;
@@ -29,7 +29,7 @@ export default function AdminSummarizerPage() {
   const fetchStats = async () => {
     try {
       const res = await fetch(
-        '${API_BASE_URL}/routes/admin/summarizer/statistics.php',
+        `${API_BASE_URL}/routes/admin/summarizer/statistics.php`,
         { credentials: 'include' }
       );
       const data = await res.json();

@@ -25,62 +25,21 @@ export default function SignIn() {
       router.replace("/");
     }
   }, [user, authLoading, router]);
-  const [emailNotVerified, setEmailNotVerified] = useState(false);
-  const [unverifiedEmail, setUnverifiedEmail] = useState("");
-  const [resendingEmail, setResendingEmail] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-
   useEffect(() => {
     if (user) {
       router.push("/dashboard");
     }
   }, [user, router]);
 
-  // Countdown timer for resend cooldown
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => {
-        setResendCooldown(resendCooldown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-  const handleResendVerification = async () => {
-    if (resendCooldown > 0) return;
 
-    setResendingEmail(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/routes/resend-verification.php`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: unverifiedEmail }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
-        setToast({ message: "تم إرسال رسالة التفعيل. تحقق من بريدك الإلكتروني.", type: "success" });
-        setEmailNotVerified(false);
-        setResendCooldown(60); // 60 seconds cooldown
-      } else {
-        setToast({ message: data.message || "حدث خطأ", type: "error" });
-      }
-    } catch {
-      setToast({ message: "حدث خطأ. حاول مرة أخرى.", type: "error" });
-    } finally {
-      setResendingEmail(false);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setEmailNotVerified(false);
 
     try {
       const res = await fetch(`${API_BASE_URL}/routes/login.php`, {
@@ -98,11 +57,6 @@ export default function SignIn() {
           window.location.href = "/";
         }, 500);
       } else {
-        // Check if email is not verified
-        if (data.email_not_verified) {
-          setEmailNotVerified(true);
-          setUnverifiedEmail(formData.email);
-        }
         setToast({ message: data.message || "فشل تسجيل الدخول", type: "error" });
       }
     } catch {
@@ -182,31 +136,7 @@ export default function SignIn() {
               </div>
             </div>
 
-            {emailNotVerified && (
-              <div className="mt-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-4">
-                <div className="flex items-start gap-3">
-                  <svg className="h-6 w-6 text-yellow-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-yellow-300 mb-1">يجب تأكيد بريدك الإلكتروني</h3>
-                    <p className="text-sm text-gray-300 mb-3">لم تقم بتفعيل حسابك بعد. تحقق من بريدك الإلكتروني واضغط على رابط التفعيل.</p>
-                    <button
-                      type="button"
-                      onClick={handleResendVerification}
-                      disabled={resendingEmail || resendCooldown > 0}
-                      className="text-sm font-medium text-yellow-400 hover:text-yellow-300 underline disabled:opacity-50"
-                    >
-                      {resendingEmail
-                        ? "جاري الإرسال..."
-                        : resendCooldown > 0
-                          ? `انتظر ${resendCooldown} ثانية`
-                          : "إعادة إرسال رسالة التفعيل"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
+
 
             <div className="mt-4 flex items-center">
               <input

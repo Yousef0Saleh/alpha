@@ -13,10 +13,6 @@ export default function SignUp() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "", grade: "" });
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error"; exiting?: boolean } | null>(null);
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState("");
-  const [resendingEmail, setResendingEmail] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
 
   const { user, loading } = useAuth();
@@ -29,44 +25,8 @@ export default function SignUp() {
     }
   }, [user, loading, router]);
 
-  // Countdown timer for resend cooldown
-  useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setTimeout(() => {
-        setResendCooldown(resendCooldown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [resendCooldown]);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-  };
-
-  const handleResendVerification = async () => {
-    if (resendCooldown > 0) return;
-
-    setResendingEmail(true);
-    try {
-      const res = await fetch(`${API_BASE_URL}/routes/resend-verification.php`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: registeredEmail }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
-        setToast({ message: "تم إرسال رسالة التفعيل مرة أخرى. تحقق من بريدك.", type: "success" });
-        setResendCooldown(60); // 60 seconds cooldown
-      } else {
-        setToast({ message: data.message || "حدث خطأ", type: "error" });
-      }
-    } catch {
-      setToast({ message: "حدث خطأ. حاول مرة أخرى.", type: "error" });
-    } finally {
-      setResendingEmail(false);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -99,13 +59,16 @@ export default function SignUp() {
       const data = await res.json();
 
       if (data.status === "success" || res.ok) {
-        setRegisteredEmail(formData.email);
-        setRegistrationSuccess(true);
+        setToast({ message: data.message || "تم إنشاء الحساب بنجاح!", type: "success" });
         setFormData({ name: "", email: "", password: "", grade: "" });
+        // Redirect to signin after 1 second
+        setTimeout(() => {
+          router.push("/signin");
+        }, 1000);
       } else {
         setToast({ message: data.message || "فشل التسجيل", type: "error" });
       }
-    } catch(err) {
+    } catch (err) {
       console.error(err);
       setToast({ message: "مشكلة في السيرفر. جرب تاني بعد شوية.", type: "error" });
     } finally {
@@ -125,78 +88,7 @@ export default function SignUp() {
 
   if (loading || user || loadingSubmit) return <LoaderOverlay />;
 
-  // Show success message after registration
-  if (registrationSuccess) {
-    return (
-      <section>
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="py-12 md:py-20">
-            <div className="mx-auto max-w-[500px] text-center">
-              <div className="mb-8 flex justify-center">
-                <div className="rounded-full bg-gradient-to-br from-green-400 to-emerald-600 p-6">
-                  <svg className="h-16 w-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              </div>
 
-              <h1 className="mb-4 animate-[gradient_6s_linear_infinite] bg-[linear-gradient(to_right,var(--color-gray-200),var(--color-emerald-200),var(--color-gray-50),var(--color-emerald-300),var(--color-gray-200))] bg-[length:200%_auto] bg-clip-text text-3xl font-semibold text-transparent md:text-4xl">
-                تم إنشاء حسابك بنجاح!
-              </h1>
-
-              <div className="mb-8 space-y-4 text-gray-300">
-                <p className="text-lg">
-                  تم إرسال رسالة تأكيد إلى:
-                </p>
-                <p className="text-xl font-semibold text-indigo-400">
-                  {registeredEmail}
-                </p>
-                <div className="mx-auto max-w-md rounded-lg bg-indigo-500/10 p-4 text-sm">
-                  <p className="mb-2 font-semibold text-indigo-300">📧 الخطوات التالية:</p>
-                  <ol className="space-y-2 text-right text-gray-300">
-                    <li>1. افتح بريدك الإلكتروني</li>
-                    <li>2. ابحث عن رسالة من منصة ألفا</li>
-                    <li>3. اضغط على رابط التفعيل</li>
-                    <li>4. سجل دخول وابدأ رحلتك!</li>
-                  </ol>
-                </div>
-
-                <p className="text-sm text-gray-400">
-                  لم تستلم الرسالة؟ تحقق من مجلد الرسائل غير المرغوب فيها (Spam)
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => router.push("/signin")}
-                  className="btn w-full bg-gradient-to-t from-indigo-600 to-indigo-500 text-white"
-                >
-                  الذهاب لتسجيل الدخول
-                </button>
-                <button
-                  onClick={handleResendVerification}
-                  disabled={resendingEmail || resendCooldown > 0}
-                  className="w-full rounded-lg border border-indigo-500/50 bg-indigo-500/10 py-2 text-sm font-medium text-indigo-400 hover:bg-indigo-500/20 disabled:opacity-50"
-                >
-                  {resendingEmail
-                    ? "جاري الإرسال..."
-                    : resendCooldown > 0
-                      ? `انتظر ${resendCooldown} ثانية...`
-                      : "لم تستلم الرسالة؟ إعادة الإرسال"}
-                </button>
-                <button
-                  onClick={() => setRegistrationSuccess(false)}
-                  className="w-full text-sm text-gray-400 hover:text-gray-300"
-                >
-                  العودة للتسجيل
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section>

@@ -10,73 +10,77 @@ import { API_BASE_URL } from "@/lib/config";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [clientError, setClientError] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error"; exiting?: boolean } | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
 
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   // Redirect logged-in user to home
   useEffect(() => {
-    if (!authLoading && user) {
+    if (!loading && user) {
       router.replace("/");
     }
-  }, [user, authLoading, router]);
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
+
+    if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      setToast({ message: "Please enter a valid email", type: "error" });
+      setSubmitting(false);
+      return;
+    }
+    if (formData.password.length < 8) {
+      setToast({ message: "Password must be at least 8 characters", type: "error" });
+      setSubmitting(false);
+      return;
+    }
+
+
+    setClientError(null);
 
     try {
       const res = await fetch(`${API_BASE_URL}/routes/login.php`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, rememberMe }),
+        body: JSON.stringify(formData),
+        credentials: "include",
       });
 
       const data = await res.json();
 
-      if (res.ok && data.status === "success") {
-        setToast({ message: "تم تسجيل الدخول بنجاح!", type: "success" });
-        setTimeout(() => {
-          window.location.href = "/";
-        }, 500);
+      if (data.status === "success") {
+        setToast({ message: data.message || "Login successful", type: "success" });
+        setFormData({ email: "", password: "" });
+        router.replace("/"); // redirect after login
       } else {
-        setToast({ message: data.message || "فشل تسجيل الدخول", type: "error" });
+        setToast({ message: data.message || "Invalid credentials", type: "error" });
       }
     } catch {
-      setToast({ message: "مشكلة في الاتصال. جرب تاني.", type: "error" });
+      setToast({ message: "Server error. Please try again.", type: "error" });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => {
-        setToast((t) => (t ? { ...t, exiting: true } : null));
+        setToast(t => t ? { ...t, exiting: true } : null);
         setTimeout(() => setToast(null), 400);
       }, 3000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
 
-  if (authLoading || user || loading) return <LoaderOverlay />;
+  if (loading || user || submitting) return <LoaderOverlay />;
 
   return (
     <section>
@@ -107,53 +111,14 @@ export default function SignIn() {
                   <label htmlFor="password" className="block text-sm font-medium text-indigo-200/65">كلمة السر</label>
                   <Link className="text-sm text-gray-600 hover:underline" href="/reset-password">نسيت كلمة السر؟</Link>
                 </div>
-                <div className="relative">
-                  <input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className="form-input w-full pl-10"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
-                  >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                <input id="password" type="password" className="form-input w-full" value={formData.password} onChange={handleChange} required />
               </div>
-            </div>
-
-
-
-            <div className="mt-4 flex items-center">
-              <input
-                id="rememberMe"
-                type="checkbox"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0"
-              />
-              <label htmlFor="rememberMe" className="mr-2 text-sm text-gray-300 cursor-pointer">
-                تذكرني لمدة 30 يوم
-              </label>
+              {clientError && <p className="text-red-500 text-sm">{clientError}</p>}
             </div>
 
             <div className="mt-6 space-y-5">
-              <button disabled={loading} className="btn w-full bg-linear-to-t from-indigo-600 to-indigo-500 text-white">
-                {loading ? "ثواني بنسجلك..." : "تسجيل دخول"}
+              <button disabled={submitting} className="btn w-full bg-linear-to-t from-indigo-600 to-indigo-500 text-white">
+                {submitting ? "ثواني بنسجلك..." : "تسجيل دخول"}
               </button>
             </div>
           </form>

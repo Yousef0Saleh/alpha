@@ -69,7 +69,7 @@ export default function ChatPage() {
   const isStreamingActive = useRef(false);
   const [limits, setLimits] = useState({
     messages_used: 0,
-    messages_limit: 20,
+    messages_limit: 50,
     files_used: 0,
     files_limit: 3,
     can_send_message: true,
@@ -653,7 +653,7 @@ export default function ChatPage() {
             <div className="max-w-6xl mx-auto">
               {!limits.can_send_message && (
                 <div className="mb-4 p-3 lg:p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs lg:text-sm text-center">
-                  وصلت للحد اليومي (20 رسالة). ارجع بكرة! 🚫
+                  وصلت للحد اليومي (50 رسالة). ارجع بكرة! 🚫
                 </div>
               )}
 

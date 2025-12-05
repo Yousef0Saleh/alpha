@@ -19,17 +19,12 @@ export default function SignIn() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
 
-  // Redirect logged-in user to home
+  // Redirect logged-in user to dashboard
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [user, authLoading, router]);
-  useEffect(() => {
-    if (user) {
-      router.push("/dashboard");
-    }
-  }, [user, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });

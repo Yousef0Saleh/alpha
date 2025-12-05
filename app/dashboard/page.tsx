@@ -48,7 +48,6 @@ export default function DashboardPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [dataLoading, setDataLoading] = useState(true);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
@@ -67,14 +66,6 @@ export default function DashboardPage() {
       }
     }
   }, [loading, user, router]);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const handleOnboardingClose = () => {
     setShowOnboarding(false);
@@ -183,57 +174,20 @@ export default function DashboardPage() {
         userName={user.name}
       />
 
-      {/* Ambient Background */}
+      {/* Ambient Background - Simplified */}
       <div className="fixed inset-0 pointer-events-none">
-        {/* Animated Gradient Orbs */}
+        {/* Single Animated Gradient Orb */}
         <motion.div
-          className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"
+          className="absolute top-1/4 left-1/3 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
+          style={{ willChange: "transform, opacity" }}
           animate={{
             scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.5, 0.3, 0.5],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/2 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.3, 1],
             opacity: [0.2, 0.4, 0.2],
           }}
           transition={{
-            duration: 12,
+            duration: 20,
             repeat: Infinity,
             ease: "easeInOut",
-          }}
-        />
-
-        {/* Mouse Follow Gradient */}
-        <motion.div
-          className="absolute w-64 h-64 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-2xl"
-          animate={{
-            x: mousePosition.x - 128,
-            y: mousePosition.y - 128,
-          }}
-          transition={{
-            type: "spring",
-            stiffness: 50,
-            damping: 20,
           }}
         />
       </div>
@@ -317,20 +271,7 @@ export default function DashboardPage() {
                     {/* Label */}
                     <p className="text-gray-400 text-sm font-medium">{stat.label}</p>
 
-                    {/* Sparkline (if has data) */}
-                    {stat.value > 0 && (
-                      <div className="mt-3 h-8 flex items-end gap-1">
-                        {[...Array(12)].map((_, i) => (
-                          <motion.div
-                            key={i}
-                            className={`flex-1 bg-gradient-to-t ${stat.color} rounded-sm opacity-30`}
-                            initial={{ height: 0 }}
-                            animate={{ height: `${Math.random() * 100}%` }}
-                            transition={{ delay: 0.5 + i * 0.05, duration: 0.5 }}
-                          />
-                        ))}
-                      </div>
-                    )}
+
                   </div>
                 </div>
               </motion.div>
@@ -387,28 +328,7 @@ export default function DashboardPage() {
                 }}
               />
 
-              {/* Floating Particles */}
-              <div className="absolute inset-0 overflow-hidden">
-                {[...Array(6)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    className="absolute w-2 h-2 bg-white/20 rounded-full"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      top: `${Math.random() * 100}%`,
-                    }}
-                    animate={{
-                      y: [0, -30, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 3 + Math.random() * 2,
-                      repeat: Infinity,
-                      delay: Math.random() * 2,
-                    }}
-                  />
-                ))}
-              </div>
+
 
               {/* Glow Orbs */}
               <div className="absolute top-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl group-hover:bg-indigo-500/30 transition-all duration-700" />

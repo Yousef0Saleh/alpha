@@ -1,14 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/hooks/useAuth";
 import Toast from "@/components/Toast";
 import LoaderOverlay from "@/components/LoaderOverlay";
 import { API_BASE_URL } from "@/lib/config";
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const router = useRouter();
@@ -292,5 +292,13 @@ export default function ResetPassword() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense fallback={<LoaderOverlay />}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }

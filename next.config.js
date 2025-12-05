@@ -15,14 +15,6 @@ const nextConfig = {
   // Compression
   compress: true,
 
-  // Production optimizations
-  swcMinify: true,
-
-  // Powering optimal performance
-  experimental: {
-    optimizeCss: true,
-  },
-
   // Rewrites for proxying backend API (solves cross-domain session issues)
   async rewrites() {
     return [

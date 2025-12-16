@@ -54,16 +54,17 @@ export default function SignIn() {
         data = JSON.parse(responseText);
       } catch (parseError) {
         // لو السيرفر رجع حاجة مش JSON (مثلاً HTML error page)
-        errorDetails = `
-HTTP Status: ${res.status} ${res.statusText}
-السيرفر رجع محتوى مش JSON
-المحتوى: ${responseText.substring(0, 500)}${responseText.length > 500 ? '...' : ''}`;
+        console.group("❌ خطأ في السيرفر - محتوى غير صحيح");
+        console.error("HTTP Status:", res.status, res.statusText);
+        console.error("Content-Type:", res.headers.get("content-type"));
+        console.error("المحتوى الكامل من السيرفر:");
+        console.log(responseText);
+        console.groupEnd();
 
         setToast({
-          message: `خطأ في السيرفر (${res.status}): السيرفر رجع محتوى غير صحيح.\nشوف Console للتفاصيل.`,
+          message: `خطأ في السيرفر (${res.status}): السيرفر رجع محتوى غير صحيح.\n\nافتح Console (F12) وشوف تفاصيل المحتوى الكامل`,
           type: "error"
         });
-        console.error("❌ خطأ في السيرفر:", errorDetails);
         setLoading(false);
         return;
       }
@@ -75,41 +76,42 @@ HTTP Status: ${res.status} ${res.statusText}
         }, 500);
       } else {
         // السيرفر رجع JSON لكن فيه مشكلة
-        errorDetails = `
-HTTP Status: ${res.status} ${res.statusText}
-رسالة السيرفر: ${data.message || 'لا توجد رسالة'}
-حالة الاستجابة: ${data.status || 'غير محدد'}`;
+        console.group("❌ خطأ من السيرفر");
+        console.error("HTTP Status:", res.status, res.statusText);
+        console.error("رسالة السيرفر:", data.message || 'لا توجد رسالة');
+        console.error("حالة الاستجابة:", data.status || 'غير محدد');
 
         // إضافة تفاصيل إضافية لو موجودة
         if (data.error) {
-          errorDetails += `\nتفاصيل الخطأ: ${data.error}`;
+          console.error("تفاصيل الخطأ:", data.error);
         }
         if (data.details) {
-          errorDetails += `\nمعلومات إضافية: ${JSON.stringify(data.details)}`;
+          console.error("معلومات إضافية:", data.details);
         }
 
-        console.error("❌ خطأ من السيرفر:", errorDetails);
+        console.error("الـ Response الكامل:", data);
+        console.groupEnd();
 
         // عرض رسالة مفصلة للمستخدم
         const userMessage = data.message || "فشل تسجيل الدخول";
         const statusInfo = res.status !== 200 ? ` (خطأ ${res.status})` : '';
 
         setToast({
-          message: `${userMessage}${statusInfo}\nشوف Console للتفاصيل الكاملة`,
+          message: `${userMessage}${statusInfo}\n\nافتح Console (F12) للتفاصيل الكاملة`,
           type: "error"
         });
       }
     } catch (error) {
       // مشكلة في الاتصال نفسه (network error)
-      const networkErrorDetails = `
-نوع الخطأ: مشكلة في الاتصال بالسيرفر
-التفاصيل: ${error instanceof Error ? error.message : 'خطأ غير معروف'}
-السيرفر: ${API_BASE_URL}/routes/login.php`;
-
-      console.error("❌ مشكلة في الاتصال:", networkErrorDetails, error);
+      console.group("❌ مشكلة في الاتصال بالسيرفر");
+      console.error("نوع الخطأ:", "Network Error");
+      console.error("التفاصيل:", error instanceof Error ? error.message : 'خطأ غير معروف');
+      console.error("السيرفر:", `${API_BASE_URL}/routes/login.php`);
+      console.error("الخطأ الكامل:", error);
+      console.groupEnd();
 
       setToast({
-        message: "مشكلة في الاتصال بالسيرفر.\nتأكد من الإنترنت أو إن السيرفر شغال.\nشوف Console للتفاصيل",
+        message: "مشكلة في الاتصال بالسيرفر.\nتأكد من الإنترنت أو إن السيرفر شغال.\n\nافتح Console (F12) للتفاصيل",
         type: "error"
       });
     } finally {

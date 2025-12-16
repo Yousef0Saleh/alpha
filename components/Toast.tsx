@@ -43,14 +43,14 @@ export default function Toast({ message, type = "success", onClose, index = 0 }:
             display: "inline-flex",
             justifyContent: "space-between",
             alignItems: "center",
-            maxWidth: "calc(100% - 40px)",
+            maxWidth: "500px",
             lineHeight: "1.3",
             fontSize: "14px",
             transition: "all 0.3s ease",
             opacity: visible ? 1 : 0,
           }}
         >
-          <span>{message}</span>
+          <span style={{ whiteSpace: "pre-line" }}>{message}</span>
           <button
             onClick={onClose}
             style={{

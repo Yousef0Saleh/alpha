@@ -44,7 +44,29 @@ export default function SignIn() {
         body: JSON.stringify({ ...formData, rememberMe }),
       });
 
-      const data = await res.json();
+      // قراءة الـ response كـ text أولاً
+      const responseText = await res.text();
+      let data;
+      let errorDetails = "";
+
+      // محاولة قراءة الـ response كـ JSON
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        // لو السيرفر رجع حاجة مش JSON (مثلاً HTML error page)
+        errorDetails = `
+HTTP Status: ${res.status} ${res.statusText}
+السيرفر رجع محتوى مش JSON
+المحتوى: ${responseText.substring(0, 500)}${responseText.length > 500 ? '...' : ''}`;
+
+        setToast({
+          message: `خطأ في السيرفر (${res.status}): السيرفر رجع محتوى غير صحيح.\nشوف Console للتفاصيل.`,
+          type: "error"
+        });
+        console.error("❌ خطأ في السيرفر:", errorDetails);
+        setLoading(false);
+        return;
+      }
 
       if (res.ok && data.status === "success") {
         setToast({ message: "تم تسجيل الدخول بنجاح!", type: "success" });
@@ -52,10 +74,44 @@ export default function SignIn() {
           window.location.href = "/";
         }, 500);
       } else {
-        setToast({ message: data.message || "فشل تسجيل الدخول", type: "error" });
+        // السيرفر رجع JSON لكن فيه مشكلة
+        errorDetails = `
+HTTP Status: ${res.status} ${res.statusText}
+رسالة السيرفر: ${data.message || 'لا توجد رسالة'}
+حالة الاستجابة: ${data.status || 'غير محدد'}`;
+
+        // إضافة تفاصيل إضافية لو موجودة
+        if (data.error) {
+          errorDetails += `\nتفاصيل الخطأ: ${data.error}`;
+        }
+        if (data.details) {
+          errorDetails += `\nمعلومات إضافية: ${JSON.stringify(data.details)}`;
+        }
+
+        console.error("❌ خطأ من السيرفر:", errorDetails);
+
+        // عرض رسالة مفصلة للمستخدم
+        const userMessage = data.message || "فشل تسجيل الدخول";
+        const statusInfo = res.status !== 200 ? ` (خطأ ${res.status})` : '';
+
+        setToast({
+          message: `${userMessage}${statusInfo}\nشوف Console للتفاصيل الكاملة`,
+          type: "error"
+        });
       }
-    } catch {
-      setToast({ message: "مشكلة في الاتصال. جرب تاني.", type: "error" });
+    } catch (error) {
+      // مشكلة في الاتصال نفسه (network error)
+      const networkErrorDetails = `
+نوع الخطأ: مشكلة في الاتصال بالسيرفر
+التفاصيل: ${error instanceof Error ? error.message : 'خطأ غير معروف'}
+السيرفر: ${API_BASE_URL}/routes/login.php`;
+
+      console.error("❌ مشكلة في الاتصال:", networkErrorDetails, error);
+
+      setToast({
+        message: "مشكلة في الاتصال بالسيرفر.\nتأكد من الإنترنت أو إن السيرفر شغال.\nشوف Console للتفاصيل",
+        type: "error"
+      });
     } finally {
       setLoading(false);
     }

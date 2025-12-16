@@ -44,50 +44,7 @@ export default function SignIn() {
         body: JSON.stringify({ ...formData, rememberMe }),
       });
 
-      // قراءة الـ response كـ text أولاً
-      let responseText = "";
-      try {
-        responseText = await res.text();
-      } catch (readError) {
-        // لو مش قادرين نقرا الـ response (غالباً CORS issue)
-        console.group("❌ خطأ في قراءة الـ Response من السيرفر");
-        console.error("HTTP Status:", res.status, res.statusText);
-        console.error("Response Type:", res.type);
-        console.error("خطأ القراءة:", readError);
-        console.error("التفاصيل: مش قادرين نقرا محتوى الـ response، ده غالباً مشكلة CORS");
-        console.groupEnd();
-
-        setToast({
-          message: `خطأ في السيرفر (${res.status}): مش قادرين نقرا الـ response.\nده غالباً مشكلة CORS في السيرفر.\n\nافتح Console (F12) للتفاصيل`,
-          type: "error"
-        });
-        setLoading(false);
-        return;
-      }
-
-      let data;
-      let errorDetails = "";
-
-      // محاولة قراءة الـ response كـ JSON
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        // لو السيرفر رجع حاجة مش JSON (مثلاً HTML error page)
-        console.group("❌ خطأ في السيرفر - محتوى غير صحيح");
-        console.error("HTTP Status:", res.status, res.statusText);
-        console.error("Content-Type:", res.headers.get("content-type"));
-        console.error("Response Text Length:", responseText.length);
-        console.error("المحتوى الكامل من السيرفر:");
-        console.log(responseText);
-        console.groupEnd();
-
-        setToast({
-          message: `خطأ في السيرفر (${res.status}): السيرفر رجع محتوى غير صحيح.\n\nافتح Console (F12) وشوف تفاصيل المحتوى الكامل`,
-          type: "error"
-        });
-        setLoading(false);
-        return;
-      }
+      const data = await res.json();
 
       if (res.ok && data.status === "success") {
         setToast({ message: "تم تسجيل الدخول بنجاح!", type: "success" });
@@ -95,45 +52,10 @@ export default function SignIn() {
           window.location.href = "/";
         }, 500);
       } else {
-        // السيرفر رجع JSON لكن فيه مشكلة
-        console.group("❌ خطأ من السيرفر");
-        console.error("HTTP Status:", res.status, res.statusText);
-        console.error("رسالة السيرفر:", data.message || 'لا توجد رسالة');
-        console.error("حالة الاستجابة:", data.status || 'غير محدد');
-
-        // إضافة تفاصيل إضافية لو موجودة
-        if (data.error) {
-          console.error("تفاصيل الخطأ:", data.error);
-        }
-        if (data.details) {
-          console.error("معلومات إضافية:", data.details);
-        }
-
-        console.error("الـ Response الكامل:", data);
-        console.groupEnd();
-
-        // عرض رسالة مفصلة للمستخدم
-        const userMessage = data.message || "فشل تسجيل الدخول";
-        const statusInfo = res.status !== 200 ? ` (خطأ ${res.status})` : '';
-
-        setToast({
-          message: `${userMessage}${statusInfo}\n\nافتح Console (F12) للتفاصيل الكاملة`,
-          type: "error"
-        });
+        setToast({ message: data.message || "فشل تسجيل الدخول", type: "error" });
       }
-    } catch (error) {
-      // مشكلة في الاتصال نفسه (network error)
-      console.group("❌ مشكلة في الاتصال بالسيرفر");
-      console.error("نوع الخطأ:", "Network Error");
-      console.error("التفاصيل:", error instanceof Error ? error.message : 'خطأ غير معروف');
-      console.error("السيرفر:", `${API_BASE_URL}/routes/login.php`);
-      console.error("الخطأ الكامل:", error);
-      console.groupEnd();
-
-      setToast({
-        message: "مشكلة في الاتصال بالسيرفر.\nتأكد من الإنترنت أو إن السيرفر شغال.\n\nافتح Console (F12) للتفاصيل",
-        type: "error"
-      });
+    } catch {
+      setToast({ message: "مشكلة في الاتصال. جرب تاني.", type: "error" });
     } finally {
       setLoading(false);
     }

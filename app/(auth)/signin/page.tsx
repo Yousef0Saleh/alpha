@@ -45,7 +45,26 @@ export default function SignIn() {
       });
 
       // قراءة الـ response كـ text أولاً
-      const responseText = await res.text();
+      let responseText = "";
+      try {
+        responseText = await res.text();
+      } catch (readError) {
+        // لو مش قادرين نقرا الـ response (غالباً CORS issue)
+        console.group("❌ خطأ في قراءة الـ Response من السيرفر");
+        console.error("HTTP Status:", res.status, res.statusText);
+        console.error("Response Type:", res.type);
+        console.error("خطأ القراءة:", readError);
+        console.error("التفاصيل: مش قادرين نقرا محتوى الـ response، ده غالباً مشكلة CORS");
+        console.groupEnd();
+
+        setToast({
+          message: `خطأ في السيرفر (${res.status}): مش قادرين نقرا الـ response.\nده غالباً مشكلة CORS في السيرفر.\n\nافتح Console (F12) للتفاصيل`,
+          type: "error"
+        });
+        setLoading(false);
+        return;
+      }
+
       let data;
       let errorDetails = "";
 
@@ -57,6 +76,7 @@ export default function SignIn() {
         console.group("❌ خطأ في السيرفر - محتوى غير صحيح");
         console.error("HTTP Status:", res.status, res.statusText);
         console.error("Content-Type:", res.headers.get("content-type"));
+        console.error("Response Text Length:", responseText.length);
         console.error("المحتوى الكامل من السيرفر:");
         console.log(responseText);
         console.groupEnd();
